@@ -1,4 +1,5 @@
 ﻿using MVCAssignment.Models;
+using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +13,26 @@ namespace MVCAssignment.Controllers
         // GET: Student
         public ActionResult Index()
         {
-            return View();
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                var students = session.Query<Student>().ToList();
+                return View(students);
+            }
         }
 
         public ActionResult Details(int? id)
         {
-            ViewBag.Message = "Your application description page no." + id;
-
-            return View();
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                ViewBag.Message = "Your application description page no." + id;
+                var student = session.Get<Student>(id);
+                return View(student);
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "LastName, FirstMidName, EnrollmentDate")] Student student)
+        public ActionResult Create([Bind(Include = "StudentName, Age, Gender, BloodGroup, Image")] Student student)
         {
             return View();
         }

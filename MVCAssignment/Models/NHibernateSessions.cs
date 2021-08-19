@@ -14,18 +14,26 @@ namespace MVCAssignment.Models
     {
         public static ISession OpenSession()
         {
-            var cfg = new Configuration();
+            /*var cfg = new Configuration();
 
             cfg.DataBaseIntegration(x =>
             {
                 x.ConnectionString = "Data Source=MUTTAKEELAP\\THINKPAD;Initial Catalog=studentdb;Integrated Security=True";
                 x.Driver<SqlClientDriver>();
                 x.Dialect<MsSql2012Dialect>();
-            });
+            });*/
+            var configuration = new Configuration();
+            var configurationPath = HttpContext.Current.Server.MapPath
+            (@"~\NHibernate\nhibernate.cfg.xml");
+            configuration.Configure(configurationPath);
 
-            cfg.AddAssembly(Assembly.GetExecutingAssembly());
+            var studentConfigurationFile = HttpContext.Current.Server.MapPath
+                (@"~\NHibernate\Student.hbm.xml");
+            configuration.AddFile(studentConfigurationFile);
 
-            ISessionFactory sessionFactory = cfg.BuildSessionFactory();
+            /* cfg.AddAssembly(Assembly.GetExecutingAssembly()); */
+
+            ISessionFactory sessionFactory = configuration.BuildSessionFactory();
             return sessionFactory.OpenSession();
         }
     }

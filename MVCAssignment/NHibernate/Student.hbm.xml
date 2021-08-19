@@ -1,0 +1,28 @@
+﻿<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+    assembly="MVCAssignment" namespace="MVCAssignment.Models">
+
+	<class name="Student" table="Students">
+
+		<id name="StudentId" column="Id" generator="native" />
+
+		<property name="Age" column="Age" />
+		<property name="Gender" column="Gender" />
+		<property name="StudentName" column="StudentName" />
+		
+	</class>
+	
+	<class name="Course" table="Courses">
+
+		<id name="CourseId" column="Id">
+			<generator class="native"/>
+		</id>
+
+		<property name="CourseName" column="CourseName" />
+		<property name="CourseCode" column="CourseCode" />
+		<property name="CourseCredit" column="CourseCredit" />
+		
+		
+
+	</class>
+
+</hibernate-mapping>
