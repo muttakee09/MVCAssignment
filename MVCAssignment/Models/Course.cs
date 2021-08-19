@@ -7,8 +7,8 @@ namespace MVCAssignment.Models
 {
     public class Course
     {
-        public string CourseName { get; set; }
-        public string CourseCode { get; set; }
-        public decimal CourseCredit { get; set; }
+        public virtual string CourseName { get; set; }
+        public virtual string CourseCode { get; set; }
+        public virtual decimal CourseCredit { get; set; }
     }
 }

@@ -5,31 +5,16 @@ using System.Web;
 
 namespace MVCAssignment.Models
 {
-    public enum BloodGroupType
-    {
-        APositive,
-        BPositive,
-        ABPositive,
-        OPositive,
-        ANegative,
-        BNegative,
-        ABNegative,
-        ONegative,
-    }
-    public enum GenderType
-    {
-        Male,
-        Female
-    }
+
     public class Student
     {
-        public int StudentId { get; set; }
-        public string StudentName { get; set; }
-        public int Age { get; set; }
-        public BloodGroupType BloodGroup { get; set; }
-        public GenderType Gender { get; set; }
-        public string Image { get; set; }
-        public Course MainCourse { get; set; }
-        public Course SupplementaryCourse { get; set; }
+        public virtual int StudentId { get; set; }
+        public virtual string StudentName { get; set; }
+        public virtual int Age { get; set; }
+        public virtual BloodGroupType BloodGroup { get; set; }
+        public virtual GenderType Gender { get; set; }
+        public virtual string Image { get; set; }
+        public virtual Course MainCourse { get; set; }
+        public virtual Course SupplementaryCourse { get; set; }
     }
 }
