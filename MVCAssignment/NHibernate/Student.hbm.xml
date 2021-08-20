@@ -9,6 +9,9 @@
 		<property name="Gender" column="Gender" />
 		<property name="StudentName" column="StudentName" />
 		
+		<many-to-one name="MainCourse" class="Course" column="MainCourse" />
+		<many-to-one name="SupplementaryCourse" class="Course" column="SupplementaryCourse" />
+		
 	</class>
 	
 	<class name="Course" table="Courses">
@@ -20,9 +23,16 @@
 		<property name="CourseName" column="CourseName" />
 		<property name="CourseCode" column="CourseCode" />
 		<property name="CourseCredit" column="CourseCredit" />
-		
-		
-
+	
+		<set name="MainStudents" inverse="true">
+			<key column= "MainCourse" />
+			<one-to-many class="Student" />
+		</set>
+	
+		<set name="SupplementaryStudents" inverse="true">
+			<key column= "SupplementaryCourse" />
+			<one-to-many class="Student" />
+		</set>
 	</class>
 
 </hibernate-mapping>
