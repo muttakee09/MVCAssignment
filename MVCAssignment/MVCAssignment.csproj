@@ -145,6 +145,7 @@
     <Compile Include="Services\StudentServiceLayer.cs" />
     <Compile Include="Services\StudentServices.cs" />
     <Compile Include="utility\Enums.cs" />
+    <None Include="Views\Shared\DisplayTemplates\Enum.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -186,6 +187,9 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Student\Index.cshtml" />
     <Content Include="Views\Student\Details.cshtml" />
+    <Content Include="Views\Student\Edit.cshtml" />
+    <Content Include="Views\Student\Create.cshtml" />
+    <Content Include="Views\Shared\_StudentForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

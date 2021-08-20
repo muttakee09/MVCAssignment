@@ -40,7 +40,6 @@ namespace MVCAssignment.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "StudentName, Age, Image, BloodGroup, Gender")] Student student)
         {
-            Console.WriteLine(ViewData.ToString());
             using (ISession session = NHibernateSessions.OpenSession())
             {
  
@@ -78,13 +77,17 @@ namespace MVCAssignment.Controllers
             }
             using (ISession session = NHibernateSessions.OpenSession())
             {
-                /*var student = session.Get<Student>(id);
-                student.StudentName = "Name";
-                student.Age = 11;
-                student.Gender = GenderType.Female;
-                student.BloodGroup = BloodGroupType.ANegative;
-                student.Image = null;*/
-                session.Update(student);
+                var currentStudent = session.Get<Student>(id);
+                currentStudent.Age = student.Age;
+                currentStudent.StudentName = student.StudentName;
+                currentStudent.BloodGroup = student.BloodGroup;
+                currentStudent.Gender = student.Gender;
+                currentStudent.Image = student.Image;
+                using (ITransaction transaction = session.BeginTransaction())
+                {
+                    session.Save(currentStudent);
+                    transaction.Commit();
+                }
                 return RedirectToAction("Index");
             }
         }

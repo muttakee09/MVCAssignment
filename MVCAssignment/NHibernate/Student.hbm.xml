@@ -5,9 +5,10 @@
 
 		<id name="StudentId" column="Id" generator="native" />
 
-		<property name="Age" column="Age" />
-		<property name="Gender" column="Gender" />
 		<property name="StudentName" column="StudentName" />
+		<property name="Age" column="Age" />
+		<property name="BloodGroup" column="BloodGroup" />
+		<property name="Gender" column="Gender" />
 		
 		<many-to-one name="MainCourse" class="Course" column="MainCourse" />
 		<many-to-one name="SupplementaryCourse" class="Course" column="SupplementaryCourse" />
