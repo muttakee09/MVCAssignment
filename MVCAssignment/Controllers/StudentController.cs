@@ -38,8 +38,9 @@ namespace MVCAssignment.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "StudentName, Age, Gender, BloodGroup, Image")] Student student)
+        public ActionResult Create([Bind(Include = "StudentName, Age, Image, BloodGroup, Gender")] Student student)
         {
+            Console.WriteLine(ViewData.ToString());
             using (ISession session = NHibernateSessions.OpenSession())
             {
  
@@ -49,15 +50,6 @@ namespace MVCAssignment.Controllers
                     return RedirectToAction("Index");
                 }
                 return View(student);
-                /*return View(student);
-                var student = new Student
-                {
-                    StudentName = "Name",
-                    Age = 11,
-                    Gender = GenderType.Female,
-                    BloodGroup = BloodGroupType.ANegative,
-                    Image = null
-                };*/
             }
         }
 
@@ -77,7 +69,8 @@ namespace MVCAssignment.Controllers
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "StudentName, Age, Gender, BloodGroup, Image")] int? id)
+        public ActionResult Edit([Bind(
+            Include = "StudentName, Age, Image, BloodGroup, Gender")] int? id, Student student)
         {
             if (id == null)
             {
@@ -85,12 +78,12 @@ namespace MVCAssignment.Controllers
             }
             using (ISession session = NHibernateSessions.OpenSession())
             {
-                var student = session.Get<Student>(id);
+                /*var student = session.Get<Student>(id);
                 student.StudentName = "Name";
                 student.Age = 11;
                 student.Gender = GenderType.Female;
                 student.BloodGroup = BloodGroupType.ANegative;
-                student.Image = null;
+                student.Image = null;*/
                 session.Update(student);
                 return RedirectToAction("Index");
             }
