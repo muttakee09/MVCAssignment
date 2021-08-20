@@ -91,5 +91,43 @@ namespace MVCAssignment.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+        public ActionResult Delete(int? id, bool? saveChangesError = false)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewBag.ErrorMessage = "Delete failed. Try again, and if the problem persists see your system administrator.";
+            }
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                var student = session.Get<Student>(id);
+                if (student == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(student);
+            }
+            
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, Student student)
+        {
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                using (ITransaction transaction = session.BeginTransaction())
+                {
+                    var std = session.Get<Student>(id);
+                    session.Delete(std);
+                    transaction.Commit();
+                }
+            }
+            return RedirectToAction("Index");
+        }
     }
 }
