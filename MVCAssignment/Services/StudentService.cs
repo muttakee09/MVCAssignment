@@ -18,7 +18,7 @@ namespace MVCAssignment.Services
         void UpdateStudent(Student std);
         void DeleteStudent(int id);
     }
-    public class StudentServices : IStudentService
+    public class StudentService : IStudentService
     {
 
         public Student GetStudent(int id)

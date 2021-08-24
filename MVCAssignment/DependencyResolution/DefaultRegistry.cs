@@ -30,8 +30,8 @@ namespace MVCAssignment.DependencyResolution {
                     scan.WithDefaultConventions();
 					scan.With(new ControllerConvention());
                 });
-            For<IStudentService>().Use<StudentServices>();
-            For<IStudentServiceLayer>().Use<StudentServiceLayer>();
+            /*For<IStudentService>().Use<StudentService>();
+            For<IStudentServiceLayer>().Use<StudentServiceLayer>();*/
             //For<IExample>().Use<Example>();
         }
 
