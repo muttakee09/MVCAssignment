@@ -26,6 +26,16 @@ namespace MVCAssignment.Services
             using (ISession session = NHibernateSessions.OpenSession())
             {
                 var student = session.Get<Student>(id);
+                if (student.MainCourse != null)
+                {
+                    student.MainCourseId = student.MainCourse.CourseId;
+
+                }
+                if (student.SupplementaryCourse != null)
+                {
+                    student.SupplementaryCourseId = student.SupplementaryCourse.CourseId;
+
+                }
                 return student;
             }
         }
@@ -78,13 +88,34 @@ namespace MVCAssignment.Services
 
         public void CreateStudent(Student student)
         {
-
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                var courseList = session.Query<Course>().ToList();
+                var MCourse = courseList.FirstOrDefault(s => s.CourseId == student.MainCourseId);
+                var SCourse = courseList.FirstOrDefault(s => s.CourseId == student.SupplementaryCourseId);
+                Student std = new Student(
+                    student.StudentName, student.Age, student.BloodGroup, student.Gender,
+                    student.Image, MCourse, SCourse);
+                session.Save(std);
+            }
         }
 
         public void UpdateStudent(Student student)
-
         {
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                using (ITransaction transaction = session.BeginTransaction())
+                {
+                    var courseList = session.Query<Course>().ToList();
+                    var MCourse = courseList.FirstOrDefault(s => s.CourseId == student.MainCourseId);
+                    var SCourse = courseList.FirstOrDefault(s => s.CourseId == student.SupplementaryCourseId);
 
+                    student.MainCourse = MCourse;
+                    student.SupplementaryCourse = SCourse;
+                    session.Update(student);
+                    transaction.Commit();
+                }
+            }
         }
 
         public void DeleteStudent(int id)

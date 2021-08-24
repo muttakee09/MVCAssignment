@@ -1,23 +1,24 @@
 ﻿using MVCAssignment.Models;
+using MVCAssignment.Services;
 using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using MVCAssignment.Services;
 
 namespace MVCAssignment.Controllers
 {
     public class StudentController : Controller
     {
         private readonly IStudentService _studentService;
+        private readonly IStudentServiceLayer _studentServiceLayer;
 
-        public StudentController(IStudentService studentService)
+        public StudentController(IStudentService studentService, IStudentServiceLayer studentServiceLayer)
         {
             _studentService = studentService;
+            _studentServiceLayer = studentServiceLayer;
         }
 
         // GET: Student
@@ -56,31 +57,19 @@ namespace MVCAssignment.Controllers
         {
             using (ISession session = NHibernateSessions.OpenSession())
             {
-                var courseList = session.Query<Course>()
-                    .ToList();
+                IList<Course> courseList = _studentService.GetCourseList();
                 ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
                 try
                 {
-                    if (image != null && image.ContentLength > 0)
-                    {
-                        string fileName = Path.GetFileName(image.FileName);
-                        string path = Path.Combine(Server.MapPath("~/Photos"), fileName);
-                        image.SaveAs(path);
-                        student.Image = Path.GetFileName(image.FileName);
-
-                    }
                     if (ModelState.IsValid)
                     {
-                        var MCourse = courseList.FirstOrDefault(s => s.CourseId == student.MainCourseId);
-                        var SCourse = courseList.FirstOrDefault(s => s.CourseId == student.SupplementaryCourseId);
-                        Student std = new Student(
-                            student.StudentName, student.Age, student.BloodGroup, student.Gender,
-                            student.Image, MCourse, SCourse);
-                        session.Save(std);
+                        student = _studentServiceLayer.UploadImage(student,
+                            Path.Combine(Server.MapPath("~/Photos")), image);
+                        _studentService.CreateStudent(student);
                         return RedirectToAction("Index");
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ViewBag.Message = ex.Message;
                     return View();
@@ -111,47 +100,30 @@ namespace MVCAssignment.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            
-            using (ISession session = NHibernateSessions.OpenSession())
+            try
             {
-                using (ITransaction transaction = session.BeginTransaction())
+                IList<Course> courseList = _studentService.GetCourseList();
+                ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
+                Student alreadySavedStudent = _studentService.GetStudent((int)id);
+                
+                var studentImage = alreadySavedStudent.Image ?? null;
+                if (studentImage != null)
                 {
-                    try
-                    {
-                        var alreadySavedStudent = session.Get<Student>(id);
-                        var courseList = session.Query<Course>()
-                            .ToList();
-                        ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
-
-                        if (image != null && image.ContentLength > 0)
-                        {
-                            string fileName = Path.GetFileName(image.FileName);
-                            string path = Path.Combine(Server.MapPath("~/Photos"), fileName);
-                            image.SaveAs(path);
-                            student.Image = Path.GetFileName(image.FileName);
-
-                        }
-                        else
-                        {
-                            student.Image = alreadySavedStudent.Image;
-                        }
-                        session.Evict(alreadySavedStudent);
-
-                        var MCourse = courseList.FirstOrDefault(s => s.CourseId == student.MainCourseId);
-                        var SCourse = courseList.FirstOrDefault(s => s.CourseId == student.SupplementaryCourseId);
-
-                        student.MainCourse = MCourse;
-                        student.SupplementaryCourse = SCourse;
-                        session.Update(student);
-                        transaction.Commit();
-                        return RedirectToAction("Index");
-                    }
-                    catch (Exception e)
-                    {
-                        ViewBag.Message = e.Message;
-                        return View();
-                    }
+                    _studentServiceLayer.UploadImage(student, Path.Combine(Server.MapPath("~/Photos")), image,
+                        alreadySavedStudent.Image);
                 }
+                else
+                {
+                    _studentServiceLayer.UploadImage(student, Path.Combine(Server.MapPath("~/Photos")), image);
+                }
+                
+                _studentService.UpdateStudent(student);
+                return RedirectToAction("Index");
+            }
+            catch (Exception e)
+            {
+                ViewBag.Message = e.Message;
+                return View();
             }
         }
 

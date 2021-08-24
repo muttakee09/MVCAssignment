@@ -31,6 +31,7 @@ namespace MVCAssignment.DependencyResolution {
 					scan.With(new ControllerConvention());
                 });
             For<IStudentService>().Use<StudentServices>();
+            For<IStudentServiceLayer>().Use<StudentServiceLayer>();
             //For<IExample>().Use<Example>();
         }
 
