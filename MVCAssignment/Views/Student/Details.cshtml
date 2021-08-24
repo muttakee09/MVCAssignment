@@ -40,6 +40,21 @@
     </dd>
 
     <dt>
+        @Html.DisplayNameFor(model => model.Image)
+    </dt>
+
+    <dd>
+        @if (Model.Image != null)
+        {
+            <img src=@Url.Content("~/Photos/" + @Model.Image) alt="@Model.Image" height="150" width="150" class="img-responsive" />
+        }
+        else
+        {
+            <span>N/A</span>
+        }
+    </dd>
+
+    <dt>
         @Html.DisplayNameFor(model => model.MainCourse.CourseName)
     </dt>
     <dd>

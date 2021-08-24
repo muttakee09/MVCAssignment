@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MVCAssignment.Models
 {
@@ -19,9 +20,28 @@ namespace MVCAssignment.Models
         public virtual BloodGroupType BloodGroup { get; set; }
         public virtual GenderType Gender { get; set; }
         public virtual string Image { get; set; }
+        
         [Display(Name = "Main course")]
-        public virtual Course MainCourse { get; set; }
+        public virtual int? MainCourseId { get; set; }
         [Display(Name = "Supplementary course")]
+        public virtual int? SupplementaryCourseId { get; set; }
+        [ForeignKey("MainCourse")]
+        public virtual Course MainCourse { get; set; }
+        [ForeignKey("SupplementaryCourse")]
         public virtual Course SupplementaryCourse { get; set; }
+
+        public Student() { }
+
+        public Student(string studentName, int age, BloodGroupType bloodGroup,
+           GenderType gender, string image, Course mainCourseEntity, Course supplementaryCourseEntity)
+        {
+            StudentName = studentName;
+            Age = age;
+            BloodGroup = bloodGroup;
+            Gender = gender;
+            Image = image;
+            MainCourse = mainCourseEntity;
+            SupplementaryCourse = supplementaryCourseEntity;
+        }
     }
 }

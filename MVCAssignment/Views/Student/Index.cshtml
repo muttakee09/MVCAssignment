@@ -12,6 +12,9 @@
 <table class="table">
     <tr>
         <th>
+            @Html.DisplayNameFor(model => model.Image)
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.StudentName)
         </th>
         <th>
@@ -28,6 +31,13 @@
 
 @foreach (var item in Model) {
     <tr>
+        <td>
+
+            @if (item.Image != null)
+            {
+                <img src=@Url.Content($"~/Photos/{item.Image}") alt="@item.Image" width=20 />
+            }
+        </td>
         <td>
             @Html.DisplayFor(modelItem => item.StudentName)
         </td>

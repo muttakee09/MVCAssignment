@@ -2,6 +2,7 @@
 using NHibernate;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -27,26 +28,74 @@ namespace MVCAssignment.Controllers
             {
                 ViewBag.Message = "Student ID: " + id;
                 var student = session.Get<Student>(id);
+                if (student.MainCourse != null)
+                {
+                    student.MainCourse = session.Get<Course>(student.MainCourse.CourseId);
+
+                }
+                if (student.SupplementaryCourse != null)
+                {
+                    student.SupplementaryCourse = session.Get<Course>(student.SupplementaryCourse.CourseId);
+
+                }
                 return View(student);
             }
         }
 
         public ActionResult Create()
         {
-            return View();
+            using (ISession session = NHibernateSessions.OpenSession())
+            {
+                var courseList = session.Query<Course>()
+                    .ToList();
+                ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
+                /*var courseList = session.Query<Course>()
+                    .Select((r) => new SelectListItem
+                    { Text = r.CourseCode + " - " + r.CourseName, Value = r.CourseId.ToString()
+                    })
+                    .ToList();
+                ViewBag.CourseList = courseList;*/
+                return View();
+            }
+            
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "StudentName, Age, Image, BloodGroup, Gender")] Student student)
+        public ActionResult Create([Bind(
+            Include = "StudentName, Age, Image, BloodGroup, Gender, MainCourseId, SupplementaryCourseId")] Student student,
+            HttpPostedFileBase image)
         {
             using (ISession session = NHibernateSessions.OpenSession())
             {
- 
-                if (ModelState.IsValid)
+                var courseList = session.Query<Course>()
+                    .ToList();
+                ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
+                try
                 {
-                    session.Save(student);
-                    return RedirectToAction("Index");
+                    if (image != null && image.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileName(image.FileName);
+                        string path = Path.Combine(Server.MapPath("~/Photos"), fileName);
+                        image.SaveAs(path);
+                        student.Image = Path.GetFileName(image.FileName);
+
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        var MCourse = courseList.FirstOrDefault(s => s.CourseId == student.MainCourseId);
+                        var SCourse = courseList.FirstOrDefault(s => s.CourseId == student.SupplementaryCourseId);
+                        Student std = new Student(
+                            student.StudentName, student.Age, student.BloodGroup, student.Gender,
+                            student.Image, MCourse, SCourse);
+                        session.Save(std);
+                        return RedirectToAction("Index");
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ViewBag.Message = ex.Message;
+                    return View();
                 }
                 return View(student);
             }
@@ -60,6 +109,19 @@ namespace MVCAssignment.Controllers
                 {
                     ViewBag.Message = "Student ID: " + id;
                     var student = session.Get<Student>(id);
+                    var courseList = session.Query<Course>()
+                     .ToList();
+                    if (student.MainCourse != null)
+                    {
+                        student.MainCourseId = student.MainCourse.CourseId;
+
+                    }
+                    if (student.SupplementaryCourse != null)
+                    {
+                        student.SupplementaryCourseId = student.SupplementaryCourse.CourseId;
+
+                    }
+                    ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
                     return View(student);
                 }
             }
@@ -69,26 +131,50 @@ namespace MVCAssignment.Controllers
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(
-            Include = "StudentName, Age, Image, BloodGroup, Gender")] int? id, Student student)
+            Include = "StudentName, Age, Image, BloodGroup, Gender, MainCourse, SupplementaryCourse")] int? id, Student student, HttpPostedFileBase image)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            
             using (ISession session = NHibernateSessions.OpenSession())
             {
-                var currentStudent = session.Get<Student>(id);
-                currentStudent.Age = student.Age;
-                currentStudent.StudentName = student.StudentName;
-                currentStudent.BloodGroup = student.BloodGroup;
-                currentStudent.Gender = student.Gender;
-                currentStudent.Image = student.Image;
-                using (ITransaction transaction = session.BeginTransaction())
+                try
                 {
-                    session.Save(currentStudent);
-                    transaction.Commit();
+                    var alreadySavedStudent = session.Get<Student>(id);
+                    var courseList = session.Query<Course>()
+                        .ToList();
+                    ViewBag.CourseList = new SelectList(courseList, "CourseId", "CourseName");
+
+                    if (image != null && image.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileName(image.FileName);
+                        string path = Path.Combine(Server.MapPath("~/Photos"), fileName);
+                        image.SaveAs(path);
+                        student.Image = Path.GetFileName(image.FileName);
+
+                    }
+                    else
+                    {
+                        student.Image = alreadySavedStudent.Image;
+                    }
+                    session.Evict(alreadySavedStudent);
+
+                    var MCourse = courseList.First(s => s.CourseId == student.MainCourseId);
+                    var SCourse = courseList.First(s => s.CourseId == student.SupplementaryCourseId);
+                    
+                    student.MainCourse = MCourse;
+                    student.SupplementaryCourse = SCourse;
+                    session.Evict(student);
+                    session.Update(student);
+                    return RedirectToAction("Index");
                 }
-                return RedirectToAction("Index");
+                catch (Exception e)
+                {
+                    ViewBag.Message = e.Message;
+                    return View();
+                }
             }
         }
 

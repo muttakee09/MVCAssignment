@@ -9,6 +9,7 @@
 		<property name="Age" column="Age" />
 		<property name="BloodGroup" column="BloodGroup" />
 		<property name="Gender" column="Gender" />
+		<property name="Image" column="Image" />
 		
 		<many-to-one name="MainCourse" class="Course" column="MainCourse" />
 		<many-to-one name="SupplementaryCourse" class="Course" column="SupplementaryCourse" />
