@@ -31,7 +31,7 @@ namespace MVCAssignment.Controllers
         {
             if (id != null)
             {
-                Student s = _studentService.GetStudentWithCourseDetails((int)id);
+                Student s = _studentService.GetStudentWithCourseDetails(id.Value);
                 return View(s);
             }
             else

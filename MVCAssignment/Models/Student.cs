@@ -20,7 +20,9 @@ namespace MVCAssignment.Models
         public virtual BloodGroupType BloodGroup { get; set; }
         public virtual GenderType Gender { get; set; }
         public virtual string Image { get; set; }
+        [Display(Name = "Main course")]
         public virtual int? MainCourseId { get; set; }
+        [Display(Name = "Supplementary course")]
         public virtual int? SupplementaryCourseId { get; set; }
         [ForeignKey("MainCourse"), Display(Name = "Main course")]
         public virtual Course MainCourse { get; set; }
